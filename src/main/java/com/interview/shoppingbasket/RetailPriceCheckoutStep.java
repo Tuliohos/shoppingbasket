@@ -13,20 +13,27 @@ public class RetailPriceCheckoutStep implements CheckoutStep {
         Basket basket = checkoutContext.getBasket();
         retailTotal = 0.0;
 
-        for (BasketItem basketItem: basket.getItems()) {
+        for (BasketItem basketItem : basket.getItems()) {
             int quantity = basketItem.getQuantity();
             double price = pricingService.getPrice(basketItem.getProductCode());
             basketItem.setProductRetailPrice(price);
-            retailTotal += quantity*price;
+
+            Promotion promotion = checkoutContext.getPromotions()
+                .stream()
+                .filter(
+                    p -> p.getProductCodes().contains(basketItem.getProductCode()))
+                .findFirst()
+                .orElse(null);
+
+            double discount = applyPromotion(promotion, basketItem);
+
+            retailTotal += quantity * price - discount;
         }
 
         checkoutContext.setRetailPriceTotal(retailTotal);
     }
 
-    public double applyPromotion(Promotion promotion, BasketItem item, double price) {
-        /*
-         * Implement applyPromotion method
-         */
-        return retailTotal;
+    public double applyPromotion(Promotion promotion, BasketItem item) {
+        return promotion != null ? promotion.calculateDiscount(item) : 0.0;
     }
 }

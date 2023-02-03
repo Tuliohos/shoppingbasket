@@ -1,5 +1,16 @@
 package com.interview.shoppingbasket;
 
-public class Promotion {
-    // Not yet implemented
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+public abstract class Promotion {
+
+    private List<String> productCodes;
+
+    public abstract double calculateDiscount(BasketItem basketItem);
+
 }
